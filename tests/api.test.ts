@@ -92,6 +92,35 @@ describe("Schedule Groups API", () => {
     });
     expect(res.statusCode).toBe(400);
   });
+
+  it("GET /schedule-groups — filters by NamePrefix", async () => {
+    await ctx.app.inject({
+      method: "POST",
+      url: "/schedule-groups/prod-group",
+      payload: {},
+    });
+    await ctx.app.inject({
+      method: "POST",
+      url: "/schedule-groups/prod-other",
+      payload: {},
+    });
+    await ctx.app.inject({
+      method: "POST",
+      url: "/schedule-groups/dev-group",
+      payload: {},
+    });
+
+    const res = await ctx.app.inject({
+      method: "GET",
+      url: "/schedule-groups?NamePrefix=prod",
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.ScheduleGroups).toHaveLength(2);
+    expect(body.ScheduleGroups.every((g: { Name: string }) => g.Name.startsWith("prod"))).toBe(
+      true
+    );
+  });
 });
 
 describe("Schedules API", () => {
@@ -135,6 +164,71 @@ describe("Schedules API", () => {
       method: "POST",
       url: "/schedules/test-schedule",
       payload: { ...validSchedule, ScheduleExpression: "bad()" },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().__type).toBe("ValidationException");
+  });
+
+  it("POST /schedules/:Name — rejects invalid State", async () => {
+    const res = await ctx.app.inject({
+      method: "POST",
+      url: "/schedules/bad-state",
+      payload: { ...validSchedule, State: "INVALID" },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().__type).toBe("ValidationException");
+    expect(res.json().Message).toContain("state");
+  });
+
+  it("POST /schedules/:Name — rejects invalid FlexibleTimeWindow.Mode", async () => {
+    const res = await ctx.app.inject({
+      method: "POST",
+      url: "/schedules/bad-mode",
+      payload: {
+        ...validSchedule,
+        FlexibleTimeWindow: { Mode: "INVALID" },
+      },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().__type).toBe("ValidationException");
+    expect(res.json().Message).toContain("flexibleTimeWindow.mode");
+  });
+
+  it("POST /schedules/:Name — rejects invalid ActionAfterCompletion", async () => {
+    const res = await ctx.app.inject({
+      method: "POST",
+      url: "/schedules/bad-action",
+      payload: { ...validSchedule, ActionAfterCompletion: "INVALID" },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().__type).toBe("ValidationException");
+    expect(res.json().Message).toContain("actionAfterCompletion");
+  });
+
+  it("POST /schedules/:Name — rejects missing Target.Arn", async () => {
+    const res = await ctx.app.inject({
+      method: "POST",
+      url: "/schedules/no-arn",
+      payload: {
+        ...validSchedule,
+        Target: { RoleArn: "arn:aws:iam::000000000000:role/test" },
+      },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().__type).toBe("ValidationException");
+    expect(res.json().Message).toContain("Target.Arn");
+  });
+
+  it("PUT /schedules/:Name — rejects invalid State", async () => {
+    await ctx.app.inject({
+      method: "POST",
+      url: "/schedules/test-schedule",
+      payload: validSchedule,
+    });
+    const res = await ctx.app.inject({
+      method: "PUT",
+      url: "/schedules/test-schedule",
+      payload: { State: "INVALID" },
     });
     expect(res.statusCode).toBe(400);
     expect(res.json().__type).toBe("ValidationException");

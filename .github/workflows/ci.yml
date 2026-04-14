@@ -54,3 +54,28 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+  version-check:
+    name: Version Check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get PR version
+        id: pr
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+      - name: Get base version
+        id: base
+        run: echo "version=$(node -p 'require("./base/package.json").version')" >> "$GITHUB_OUTPUT"
+      - name: Compare versions
+        run: |
+          echo "Base version: ${{ steps.base.outputs.version }}"
+          echo "PR version:   ${{ steps.pr.outputs.version }}"
+          if [ "${{ steps.pr.outputs.version }}" = "${{ steps.base.outputs.version }}" ]; then
+            echo "::error::package.json version has not been updated. Please run 'npm version patch|minor|major' before merging."
+            exit 1
+          fi

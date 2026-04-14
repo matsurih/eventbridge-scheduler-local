@@ -2,28 +2,11 @@ name: Publish Docker Image
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
-  release:
-    types: [published]
 
 jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
-
   build-and-push:
     name: Build & Push
-    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,7 +38,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha,prefix=
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v6

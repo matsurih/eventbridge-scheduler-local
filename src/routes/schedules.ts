@@ -64,10 +64,7 @@ export function registerScheduleRoutes(app: FastifyInstance, repo: ScheduleRepos
         `1 validation error detected: Value '${body.State}' at 'state' failed to satisfy constraint: Member must satisfy enum value set: [ENABLED, DISABLED]`
       );
     }
-    if (
-      body.FlexibleTimeWindow.Mode !== "OFF" &&
-      body.FlexibleTimeWindow.Mode !== "FLEXIBLE"
-    ) {
+    if (body.FlexibleTimeWindow.Mode !== "OFF" && body.FlexibleTimeWindow.Mode !== "FLEXIBLE") {
       throw new ValidationException(
         `1 validation error detected: Value '${body.FlexibleTimeWindow.Mode}' at 'flexibleTimeWindow.mode' failed to satisfy constraint: Member must satisfy enum value set: [OFF, FLEXIBLE]`
       );

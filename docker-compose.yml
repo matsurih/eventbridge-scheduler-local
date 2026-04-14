@@ -2,9 +2,9 @@ services:
   scheduler:
     build: .
     ports:
-      - "8293:8293"
+      - "4590:4590"
     environment:
-      PORT: 8293
+      PORT: 4590
       DB_PATH: /data/scheduler.db
       SCHEDULER_SQS_ENDPOINT: http://localstack:4566
       SCHEDULER_LAMBDA_ENDPOINT: http://localstack:4566

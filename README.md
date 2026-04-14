@@ -16,7 +16,7 @@ services:
     image: eventbridge-scheduler-local
     build: .
     ports:
-      - "8293:8293"
+      - "4590:4590"
     environment:
       SCHEDULER_SQS_ENDPOINT: http://localstack:4566
       SCHEDULER_LAMBDA_ENDPOINT: http://localstack:4566
@@ -36,7 +36,7 @@ npm test        # run vitest
 
 | Variable                    | Default                 | Description                                 |
 | --------------------------- | ----------------------- | ------------------------------------------- |
-| `PORT`                      | `8293`                  | Server port                                 |
+| `PORT`                      | `4590`                  | Server port                                 |
 | `DB_PATH`                   | `:memory:`              | SQLite path (`:memory:` or file path)       |
 | `SCHEDULER_SQS_ENDPOINT`    | `http://localhost:4566` | SQS endpoint for target dispatch            |
 | `SCHEDULER_LAMBDA_ENDPOINT` | `http://localhost:4566` | Lambda endpoint for target dispatch         |
@@ -48,7 +48,7 @@ npm test        # run vitest
 import { SchedulerClient, CreateScheduleCommand } from "@aws-sdk/client-scheduler";
 
 const client = new SchedulerClient({
-  endpoint: "http://localhost:8293",
+  endpoint: "http://localhost:4590",
   region: "us-east-1",
   credentials: { accessKeyId: "test", secretAccessKey: "test" },
 });

@@ -13,6 +13,6 @@ COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 ENV NODE_ENV=production
-EXPOSE 8293
+EXPOSE 4590
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "dist/index.js"]

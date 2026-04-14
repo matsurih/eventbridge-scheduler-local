@@ -1,0 +1,16 @@
+services:
+  scheduler:
+    build: .
+    ports:
+      - "8293:8293"
+    environment:
+      PORT: 8293
+      DB_PATH: /data/scheduler.db
+      SCHEDULER_SQS_ENDPOINT: http://localstack:4566
+      SCHEDULER_LAMBDA_ENDPOINT: http://localstack:4566
+      NODE_ENV: development
+    volumes:
+      - scheduler-data:/data
+
+volumes:
+  scheduler-data:

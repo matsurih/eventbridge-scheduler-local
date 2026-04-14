@@ -8,13 +8,19 @@ LocalStack's EventBridge Scheduler support doesn't actually fire schedules. This
 
 ## Quick Start
 
+### Docker
+
+```bash
+docker pull ghcr.io/matsurih/eventbridge-scheduler-local:latest
+docker run -p 4590:4590 ghcr.io/matsurih/eventbridge-scheduler-local:latest
+```
+
 ### Docker Compose
 
 ```yaml
 services:
   scheduler:
-    image: eventbridge-scheduler-local
-    build: .
+    image: ghcr.io/matsurih/eventbridge-scheduler-local:latest
     ports:
       - "4590:4590"
     environment:

@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  parseScheduleExpression,
-  shouldFire,
-  nextFireTime,
-} from "../src/util/expression.js";
+import { parseScheduleExpression, shouldFire, nextFireTime } from "../src/util/expression.js";
 
 describe("parseScheduleExpression", () => {
   it("parses rate expressions", () => {
@@ -36,17 +32,13 @@ describe("parseScheduleExpression", () => {
   });
 
   it("throws on invalid expressions", () => {
-    expect(() => parseScheduleExpression("invalid")).toThrow(
-      "Invalid schedule expression"
-    );
+    expect(() => parseScheduleExpression("invalid")).toThrow("Invalid schedule expression");
   });
 });
 
 describe("shouldFire — rate", () => {
   it("fires immediately if never run", () => {
-    expect(
-      shouldFire("rate(5 minutes)", "UTC", null, new Date("2025-01-01T00:00:00Z"))
-    ).toBe(true);
+    expect(shouldFire("rate(5 minutes)", "UTC", null, new Date("2025-01-01T00:00:00Z"))).toBe(true);
   });
 
   it("fires when interval elapsed", () => {
@@ -89,9 +81,9 @@ describe("shouldFire — cron", () => {
   });
 
   it("throws on L/# extensions", () => {
-    expect(() =>
-      shouldFire("cron(0 12 L * ? *)", "UTC", null, new Date())
-    ).toThrow("L and # cron extensions are not currently supported");
+    expect(() => shouldFire("cron(0 12 L * ? *)", "UTC", null, new Date())).toThrow(
+      "L and # cron extensions are not currently supported"
+    );
   });
 
   it("normalizes ? to *", () => {
@@ -104,23 +96,13 @@ describe("shouldFire — cron", () => {
 describe("shouldFire — at", () => {
   it("fires when time has passed", () => {
     expect(
-      shouldFire(
-        "at(2025-01-01T12:00:00)",
-        "UTC",
-        null,
-        new Date("2025-01-01T12:00:01Z")
-      )
+      shouldFire("at(2025-01-01T12:00:00)", "UTC", null, new Date("2025-01-01T12:00:01Z"))
     ).toBe(true);
   });
 
   it("does not fire before the target time", () => {
     expect(
-      shouldFire(
-        "at(2025-01-01T12:00:00)",
-        "UTC",
-        null,
-        new Date("2025-01-01T11:59:59Z")
-      )
+      shouldFire("at(2025-01-01T12:00:00)", "UTC", null, new Date("2025-01-01T11:59:59Z"))
     ).toBe(false);
   });
 
@@ -138,20 +120,10 @@ describe("shouldFire — at", () => {
   it("respects timezone", () => {
     // at(2025-01-01T12:00:00) in Asia/Tokyo is 03:00 UTC
     expect(
-      shouldFire(
-        "at(2025-01-01T12:00:00)",
-        "Asia/Tokyo",
-        null,
-        new Date("2025-01-01T03:00:01Z")
-      )
+      shouldFire("at(2025-01-01T12:00:00)", "Asia/Tokyo", null, new Date("2025-01-01T03:00:01Z"))
     ).toBe(true);
     expect(
-      shouldFire(
-        "at(2025-01-01T12:00:00)",
-        "Asia/Tokyo",
-        null,
-        new Date("2025-01-01T02:59:59Z")
-      )
+      shouldFire("at(2025-01-01T12:00:00)", "Asia/Tokyo", null, new Date("2025-01-01T02:59:59Z"))
     ).toBe(false);
   });
 });

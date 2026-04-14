@@ -42,11 +42,7 @@ export function shouldFire(
   }
 }
 
-function shouldFireRate(
-  expression: string,
-  lastRun: Date | null,
-  currentTime: Date
-): boolean {
+function shouldFireRate(expression: string, lastRun: Date | null, currentTime: Date): boolean {
   const match = RATE_RE.exec(expression);
   if (!match) return false;
 
@@ -91,9 +87,7 @@ function shouldFireCron(
   // Check for unsupported L / # patterns
   const raw = fields.join(" ");
   if (/[L#]/.test(raw)) {
-    throw new ValidationException(
-      "L and # cron extensions are not currently supported"
-    );
+    throw new ValidationException("L and # cron extensions are not currently supported");
   }
 
   // Drop the year field (6th), normalize ? to *
@@ -149,11 +143,7 @@ function shouldFireAt(
  * Compute the next fire time for a given expression.
  * Used for informational purposes.
  */
-export function nextFireTime(
-  expression: string,
-  timezone: string,
-  currentTime: Date
-): Date | null {
+export function nextFireTime(expression: string, timezone: string, currentTime: Date): Date | null {
   const parsed = parseScheduleExpression(expression);
 
   switch (parsed.type) {
@@ -163,10 +153,17 @@ export function nextFireTime(
       const unit = match[2].replace(/s$/, "");
       let ms: number;
       switch (unit) {
-        case "minute": ms = value * 60_000; break;
-        case "hour": ms = value * 3_600_000; break;
-        case "day": ms = value * 86_400_000; break;
-        default: return null;
+        case "minute":
+          ms = value * 60_000;
+          break;
+        case "hour":
+          ms = value * 3_600_000;
+          break;
+        case "day":
+          ms = value * 86_400_000;
+          break;
+        default:
+          return null;
       }
       return new Date(currentTime.getTime() + ms);
     }
@@ -192,9 +189,7 @@ export function nextFireTime(
       const match = AT_RE.exec(expression);
       if (!match) return null;
       const dt = DateTime.fromISO(match[1], { zone: timezone || "UTC" });
-      return dt.isValid && dt.toMillis() > currentTime.getTime()
-        ? dt.toJSDate()
-        : null;
+      return dt.isValid && dt.toMillis() > currentTime.getTime() ? dt.toJSDate() : null;
     }
   }
 }

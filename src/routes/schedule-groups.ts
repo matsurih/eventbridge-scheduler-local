@@ -18,10 +18,7 @@ function groupRowToApi(row: ScheduleGroupRow): ScheduleGroup {
   };
 }
 
-export function registerScheduleGroupRoutes(
-  app: FastifyInstance,
-  repo: ScheduleRepository
-): void {
+export function registerScheduleGroupRoutes(app: FastifyInstance, repo: ScheduleRepository): void {
   // CreateScheduleGroup — POST /schedule-groups/:Name
   app.post<{
     Params: { Name: string };
@@ -33,9 +30,7 @@ export function registerScheduleGroupRoutes(
 
     const existing = repo.getGroup(name);
     if (existing) {
-      throw new ConflictException(
-        `Schedule group ${name} already exists.`
-      );
+      throw new ConflictException(`Schedule group ${name} already exists.`);
     }
 
     const ts = nowISO();
@@ -62,9 +57,7 @@ export function registerScheduleGroupRoutes(
 
     const row = repo.getGroup(name);
     if (!row) {
-      throw new ResourceNotFoundException(
-        `Schedule group ${name} does not exist.`
-      );
+      throw new ResourceNotFoundException(`Schedule group ${name} does not exist.`);
     }
 
     return reply.status(200).send(groupRowToApi(row));
@@ -82,9 +75,7 @@ export function registerScheduleGroupRoutes(
 
     const deleted = repo.deleteGroup(name);
     if (!deleted) {
-      throw new ResourceNotFoundException(
-        `Schedule group ${name} does not exist.`
-      );
+      throw new ResourceNotFoundException(`Schedule group ${name} does not exist.`);
     }
 
     return reply.status(200).send({});

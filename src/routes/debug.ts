@@ -12,19 +12,22 @@ function parseDuration(s: string): number {
   if (!match) throw new Error(`Invalid duration: ${s}`);
   const value = parseInt(match[1], 10);
   switch (match[2]) {
-    case "ms": return value;
-    case "s": return value * 1000;
-    case "m": return value * 60_000;
-    case "h": return value * 3_600_000;
-    case "d": return value * 86_400_000;
-    default: return 0;
+    case "ms":
+      return value;
+    case "s":
+      return value * 1000;
+    case "m":
+      return value * 60_000;
+    case "h":
+      return value * 3_600_000;
+    case "d":
+      return value * 86_400_000;
+    default:
+      return 0;
   }
 }
 
-export function registerDebugRoutes(
-  app: FastifyInstance,
-  repo: ScheduleRepository
-): void {
+export function registerDebugRoutes(app: FastifyInstance, repo: ScheduleRepository): void {
   // Block all debug routes in production
   app.addHook("onRequest", async (request, reply) => {
     if (config.isProduction && request.url.startsWith("/_debug")) {
@@ -57,14 +60,11 @@ export function registerDebugRoutes(
     Querystring: { groupName?: string };
   }>("/_debug/fire/:name", async (request, reply) => {
     const name = request.params.name;
-    const groupName =
-      (request.query as Record<string, string>).groupName ?? "default";
+    const groupName = (request.query as Record<string, string>).groupName ?? "default";
 
     const schedule = repo.getSchedule(name, groupName);
     if (!schedule) {
-      throw new ResourceNotFoundException(
-        `Schedule ${name} does not exist in group ${groupName}.`
-      );
+      throw new ResourceNotFoundException(`Schedule ${name} does not exist in group ${groupName}.`);
     }
 
     const result = await fireSchedule(repo, schedule);
@@ -78,13 +78,7 @@ export function registerDebugRoutes(
 
   // GET /_debug/schedules — all schedules in internal form
   app.get("/_debug/schedules", async (_request, reply) => {
-    const { schedules } = repo.listSchedules(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      10000
-    );
+    const { schedules } = repo.listSchedules(undefined, undefined, undefined, undefined, 10000);
 
     return reply.status(200).send({
       currentTime: now().toISOString(),

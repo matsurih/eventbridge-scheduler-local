@@ -34,13 +34,13 @@ npm test        # run vitest
 
 ## Configuration
 
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `8293` | Server port |
-| `DB_PATH` | `:memory:` | SQLite path (`:memory:` or file path) |
-| `SCHEDULER_SQS_ENDPOINT` | `http://localhost:4566` | SQS endpoint for target dispatch |
-| `SCHEDULER_LAMBDA_ENDPOINT` | `http://localhost:4566` | Lambda endpoint for target dispatch |
-| `NODE_ENV` | `development` | Set `production` to disable debug endpoints |
+| Variable                    | Default                 | Description                                 |
+| --------------------------- | ----------------------- | ------------------------------------------- |
+| `PORT`                      | `8293`                  | Server port                                 |
+| `DB_PATH`                   | `:memory:`              | SQLite path (`:memory:` or file path)       |
+| `SCHEDULER_SQS_ENDPOINT`    | `http://localhost:4566` | SQS endpoint for target dispatch            |
+| `SCHEDULER_LAMBDA_ENDPOINT` | `http://localhost:4566` | Lambda endpoint for target dispatch         |
+| `NODE_ENV`                  | `development`           | Set `production` to disable debug endpoints |
 
 ## SDK Usage
 
@@ -53,31 +53,33 @@ const client = new SchedulerClient({
   credentials: { accessKeyId: "test", secretAccessKey: "test" },
 });
 
-await client.send(new CreateScheduleCommand({
-  Name: "my-schedule",
-  ScheduleExpression: "rate(5 minutes)",
-  Target: {
-    Arn: "arn:aws:sqs:us-east-1:000000000000:my-queue",
-    RoleArn: "arn:aws:iam::000000000000:role/scheduler-role",
-    Input: JSON.stringify({ hello: "world" }),
-  },
-  FlexibleTimeWindow: { Mode: "OFF" },
-}));
+await client.send(
+  new CreateScheduleCommand({
+    Name: "my-schedule",
+    ScheduleExpression: "rate(5 minutes)",
+    Target: {
+      Arn: "arn:aws:sqs:us-east-1:000000000000:my-queue",
+      RoleArn: "arn:aws:iam::000000000000:role/scheduler-role",
+      Input: JSON.stringify({ hello: "world" }),
+    },
+    FlexibleTimeWindow: { Mode: "OFF" },
+  })
+);
 ```
 
 ## Supported APIs
 
-| Method | Path | Action |
-|---|---|---|
-| POST | `/schedules/{Name}` | CreateSchedule |
-| GET | `/schedules/{Name}` | GetSchedule |
-| PUT | `/schedules/{Name}` | UpdateSchedule |
-| DELETE | `/schedules/{Name}` | DeleteSchedule |
-| GET | `/schedules` | ListSchedules |
-| POST | `/schedule-groups/{Name}` | CreateScheduleGroup |
-| GET | `/schedule-groups/{Name}` | GetScheduleGroup |
+| Method | Path                      | Action              |
+| ------ | ------------------------- | ------------------- |
+| POST   | `/schedules/{Name}`       | CreateSchedule      |
+| GET    | `/schedules/{Name}`       | GetSchedule         |
+| PUT    | `/schedules/{Name}`       | UpdateSchedule      |
+| DELETE | `/schedules/{Name}`       | DeleteSchedule      |
+| GET    | `/schedules`              | ListSchedules       |
+| POST   | `/schedule-groups/{Name}` | CreateScheduleGroup |
+| GET    | `/schedule-groups/{Name}` | GetScheduleGroup    |
 | DELETE | `/schedule-groups/{Name}` | DeleteScheduleGroup |
-| GET | `/schedule-groups` | ListScheduleGroups |
+| GET    | `/schedule-groups`        | ListScheduleGroups  |
 
 ## Schedule Expressions
 
@@ -91,12 +93,12 @@ await client.send(new CreateScheduleCommand({
 
 Targets are dispatched based on the `Arn` pattern:
 
-| Pattern | Handler |
-|---|---|
-| `arn:aws:sqs:*` | SQS `SendMessage` via `SCHEDULER_SQS_ENDPOINT` |
-| `arn:aws:lambda:*` | Lambda `Invoke` via `SCHEDULER_LAMBDA_ENDPOINT` |
-| `http://` or `https://` | HTTP POST (custom extension) |
-| Everything else | Log-only fallback |
+| Pattern                 | Handler                                         |
+| ----------------------- | ----------------------------------------------- |
+| `arn:aws:sqs:*`         | SQS `SendMessage` via `SCHEDULER_SQS_ENDPOINT`  |
+| `arn:aws:lambda:*`      | Lambda `Invoke` via `SCHEDULER_LAMBDA_ENDPOINT` |
+| `http://` or `https://` | HTTP POST (custom extension)                    |
+| Everything else         | Log-only fallback                               |
 
 Retry policy (`MaximumRetryAttempts`, `MaximumEventAgeInSeconds`) and dead letter queue (`DeadLetterConfig.Arn`) are supported.
 
@@ -104,9 +106,9 @@ Retry policy (`MaximumRetryAttempts`, `MaximumEventAgeInSeconds`) and dead lette
 
 Available when `NODE_ENV != production`:
 
-| Method | Path | Description |
-|---|---|---|
-| POST | `/_debug/tick?advance=1h` | Advance virtual clock and trigger evaluation |
-| POST | `/_debug/fire/{name}` | Manually fire a schedule immediately |
-| GET | `/_debug/schedules` | All schedules in internal format |
-| GET | `/_debug/history?name=...` | Execution history |
+| Method | Path                       | Description                                  |
+| ------ | -------------------------- | -------------------------------------------- |
+| POST   | `/_debug/tick?advance=1h`  | Advance virtual clock and trigger evaluation |
+| POST   | `/_debug/fire/{name}`      | Manually fire a schedule immediately         |
+| GET    | `/_debug/schedules`        | All schedules in internal format             |
+| GET    | `/_debug/history?name=...` | Execution history                            |

@@ -1,7 +1,7 @@
 import type { ScheduleRepository } from "../db/repository.js";
 import type { Target, ScheduleRow } from "../types.js";
 import { shouldFire } from "../util/expression.js";
-import { now, nowISO } from "../util/clock.js";
+import { now } from "../util/clock.js";
 import { dispatchTarget } from "../dispatch/dispatcher.js";
 
 let tickTimer: ReturnType<typeof setInterval> | null = null;
@@ -53,10 +53,7 @@ export async function tick(repo: ScheduleRepository): Promise<number> {
         firedCount++;
       }
     } catch (err) {
-      console.error(
-        `[engine] Error evaluating schedule ${schedule.name}:`,
-        err
-      );
+      console.error(`[engine] Error evaluating schedule ${schedule.name}:`, err);
     }
   }
 
@@ -110,9 +107,7 @@ export async function fireSchedule(
       );
     } else {
       repo.disableSchedule(schedule.name, schedule.group_name);
-      console.log(
-        `[engine] Disabled one-shot schedule ${schedule.name} after firing`
-      );
+      console.log(`[engine] Disabled one-shot schedule ${schedule.name} after firing`);
     }
   }
 

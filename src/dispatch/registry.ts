@@ -1,9 +1,6 @@
 import type { Target, DispatchContext } from "../types.js";
 
-export type TargetHandler = (
-  target: Target,
-  ctx: DispatchContext
-) => Promise<void>;
+export type TargetHandler = (target: Target, ctx: DispatchContext) => Promise<void>;
 
 interface HandlerEntry {
   pattern: RegExp;

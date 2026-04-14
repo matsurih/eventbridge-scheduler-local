@@ -42,16 +42,11 @@ async function sqsHandler(target: Target, ctx: DispatchContext): Promise<void> {
     throw new Error(`SQS SendMessage failed (${resp.status}): ${body}`);
   }
 
-  console.log(
-    `[dispatch] SQS message sent to ${queueName} for schedule ${ctx.scheduleName}`
-  );
+  console.log(`[dispatch] SQS message sent to ${queueName} for schedule ${ctx.scheduleName}`);
 }
 
 // --- Lambda Handler ---
-async function lambdaHandler(
-  target: Target,
-  ctx: DispatchContext
-): Promise<void> {
+async function lambdaHandler(target: Target, ctx: DispatchContext): Promise<void> {
   const { resource } = parseArn(target.Arn);
   // resource = "function:my-function" or "function:my-function:qualifier"
   const functionName = resource.replace(/^function:/, "").split(":")[0];
@@ -68,16 +63,11 @@ async function lambdaHandler(
     throw new Error(`Lambda Invoke failed (${resp.status}): ${body}`);
   }
 
-  console.log(
-    `[dispatch] Lambda ${functionName} invoked for schedule ${ctx.scheduleName}`
-  );
+  console.log(`[dispatch] Lambda ${functionName} invoked for schedule ${ctx.scheduleName}`);
 }
 
 // --- HTTP Handler (custom extension) ---
-async function httpHandler(
-  target: Target,
-  ctx: DispatchContext
-): Promise<void> {
+async function httpHandler(target: Target, ctx: DispatchContext): Promise<void> {
   const resp = await fetch(target.Arn, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -89,16 +79,11 @@ async function httpHandler(
     throw new Error(`HTTP target failed (${resp.status}): ${body}`);
   }
 
-  console.log(
-    `[dispatch] HTTP POST to ${target.Arn} for schedule ${ctx.scheduleName}`
-  );
+  console.log(`[dispatch] HTTP POST to ${target.Arn} for schedule ${ctx.scheduleName}`);
 }
 
 // --- Fallback Handler ---
-async function fallbackHandler(
-  target: Target,
-  ctx: DispatchContext
-): Promise<void> {
+async function fallbackHandler(target: Target, ctx: DispatchContext): Promise<void> {
   console.log(
     `[dispatch] No handler for ARN pattern ${target.Arn}, schedule ${ctx.scheduleName} — logged and skipped`
   );

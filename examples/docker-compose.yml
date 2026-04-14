@@ -1,0 +1,32 @@
+services:
+  scheduler:
+    build: ..
+    ports:
+      - "4590:4590"
+    environment:
+      PORT: 4590
+      DB_PATH: /data/scheduler.db
+      SCHEDULER_SQS_ENDPOINT: http://localstack:4566
+      SCHEDULER_LAMBDA_ENDPOINT: http://localstack:4566
+      NODE_ENV: development
+    volumes:
+      - scheduler-data:/data
+    depends_on:
+      localstack:
+        condition: service_healthy
+
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs
+      DEFAULT_REGION: ap-northeast-1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  scheduler-data:

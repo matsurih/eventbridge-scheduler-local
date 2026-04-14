@@ -31,13 +31,25 @@ export class ScheduleRepository {
   }
 
   listGroups(
+    namePrefix?: string,
     nextToken?: string,
     maxResults = 50
   ): { groups: ScheduleGroupRow[]; nextToken?: string } {
     const offset = nextToken ? parseInt(nextToken, 10) : 0;
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (namePrefix) {
+      conditions.push("name LIKE ?");
+      params.push(namePrefix + "%");
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+    params.push(maxResults + 1, offset);
+
     const groups = this.db
-      .prepare("SELECT * FROM schedule_groups ORDER BY name LIMIT ? OFFSET ?")
-      .all(maxResults + 1, offset) as ScheduleGroupRow[];
+      .prepare(`SELECT * FROM schedule_groups ${where} ORDER BY name LIMIT ? OFFSET ?`)
+      .all(...params) as ScheduleGroupRow[];
 
     const hasMore = groups.length > maxResults;
     if (hasMore) groups.pop();

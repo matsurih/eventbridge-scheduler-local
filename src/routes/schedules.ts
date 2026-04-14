@@ -55,7 +55,32 @@ export function registerScheduleRoutes(app: FastifyInstance, repo: ScheduleRepos
     if (!name) throw new ValidationException("Name is required");
     if (!body.ScheduleExpression) throw new ValidationException("ScheduleExpression is required");
     if (!body.Target) throw new ValidationException("Target is required");
+    if (!body.Target.Arn) throw new ValidationException("Target.Arn is required");
     if (!body.FlexibleTimeWindow) throw new ValidationException("FlexibleTimeWindow is required");
+
+    // Validate enum values
+    if (body.State && body.State !== "ENABLED" && body.State !== "DISABLED") {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.State}' at 'state' failed to satisfy constraint: Member must satisfy enum value set: [ENABLED, DISABLED]`
+      );
+    }
+    if (
+      body.FlexibleTimeWindow.Mode !== "OFF" &&
+      body.FlexibleTimeWindow.Mode !== "FLEXIBLE"
+    ) {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.FlexibleTimeWindow.Mode}' at 'flexibleTimeWindow.mode' failed to satisfy constraint: Member must satisfy enum value set: [OFF, FLEXIBLE]`
+      );
+    }
+    if (
+      body.ActionAfterCompletion &&
+      body.ActionAfterCompletion !== "NONE" &&
+      body.ActionAfterCompletion !== "DELETE"
+    ) {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.ActionAfterCompletion}' at 'actionAfterCompletion' failed to satisfy constraint: Member must satisfy enum value set: [NONE, DELETE]`
+      );
+    }
 
     // Validate expression
     parseScheduleExpression(body.ScheduleExpression);
@@ -147,6 +172,32 @@ export function registerScheduleRoutes(app: FastifyInstance, repo: ScheduleRepos
 
     if (body.ScheduleExpression) {
       parseScheduleExpression(body.ScheduleExpression);
+    }
+    if (body.State && body.State !== "ENABLED" && body.State !== "DISABLED") {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.State}' at 'state' failed to satisfy constraint: Member must satisfy enum value set: [ENABLED, DISABLED]`
+      );
+    }
+    if (
+      body.FlexibleTimeWindow &&
+      body.FlexibleTimeWindow.Mode !== "OFF" &&
+      body.FlexibleTimeWindow.Mode !== "FLEXIBLE"
+    ) {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.FlexibleTimeWindow.Mode}' at 'flexibleTimeWindow.mode' failed to satisfy constraint: Member must satisfy enum value set: [OFF, FLEXIBLE]`
+      );
+    }
+    if (
+      body.ActionAfterCompletion &&
+      body.ActionAfterCompletion !== "NONE" &&
+      body.ActionAfterCompletion !== "DELETE"
+    ) {
+      throw new ValidationException(
+        `1 validation error detected: Value '${body.ActionAfterCompletion}' at 'actionAfterCompletion' failed to satisfy constraint: Member must satisfy enum value set: [NONE, DELETE]`
+      );
+    }
+    if (body.Target && !body.Target.Arn) {
+      throw new ValidationException("Target.Arn is required");
     }
 
     const ts = nowISO();

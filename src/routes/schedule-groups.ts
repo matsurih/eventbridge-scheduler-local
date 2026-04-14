@@ -92,15 +92,10 @@ export function registerScheduleGroupRoutes(app: FastifyInstance, repo: Schedule
     const q = request.query as Record<string, string | undefined>;
     const maxResults = q.MaxResults ? parseInt(q.MaxResults, 10) : 50;
 
-    const { groups, nextToken } = repo.listGroups(q.NextToken, maxResults);
-
-    let filteredGroups = groups;
-    if (q.NamePrefix) {
-      filteredGroups = groups.filter((g) => g.name.startsWith(q.NamePrefix!));
-    }
+    const { groups, nextToken } = repo.listGroups(q.NamePrefix, q.NextToken, maxResults);
 
     const response: Record<string, unknown> = {
-      ScheduleGroups: filteredGroups.map(groupRowToApi),
+      ScheduleGroups: groups.map(groupRowToApi),
     };
 
     if (nextToken) {

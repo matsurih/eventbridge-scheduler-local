@@ -37,9 +37,7 @@ const createResult = await client.send(
 console.log("Created schedule:", createResult.ScheduleArn);
 
 // Verify it was created
-const getResult = await client.send(
-  new GetScheduleCommand({ Name: "ping" })
-);
+const getResult = await client.send(new GetScheduleCommand({ Name: "ping" }));
 
 console.log("Schedule details:", {
   Name: getResult.Name,

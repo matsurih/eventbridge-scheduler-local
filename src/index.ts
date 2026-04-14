@@ -21,9 +21,7 @@ process.on("SIGINT", shutdown);
 
 try {
   await app.listen({ port: config.port, host: "0.0.0.0" });
-  console.log(
-    `[main] EventBridge Scheduler Local running on port ${config.port}`
-  );
+  console.log(`[main] EventBridge Scheduler Local running on port ${config.port}`);
 } catch (err) {
   app.log.error(err);
   process.exit(1);

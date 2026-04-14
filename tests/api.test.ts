@@ -154,9 +154,7 @@ describe("Schedules API", () => {
     const body = res.json();
     expect(body.Name).toBe("test-schedule");
     expect(body.ScheduleExpression).toBe("rate(5 minutes)");
-    expect(body.Target.Arn).toBe(
-      "arn:aws:sqs:us-east-1:000000000000:my-queue"
-    );
+    expect(body.Target.Arn).toBe("arn:aws:sqs:us-east-1:000000000000:my-queue");
   });
 
   it("GET /schedules/:Name — 404 on not found", async () => {

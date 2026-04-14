@@ -25,14 +25,12 @@ function scheduleRowToApi(row: ScheduleRow): Schedule {
     KmsKeyArn: row.kms_key_arn ?? undefined,
     CreationDate: row.creation_date,
     LastModificationDate: row.last_modification_date,
-    ActionAfterCompletion: (row.action_after_completion as Schedule["ActionAfterCompletion"]) ?? undefined,
+    ActionAfterCompletion:
+      (row.action_after_completion as Schedule["ActionAfterCompletion"]) ?? undefined,
   };
 }
 
-export function registerScheduleRoutes(
-  app: FastifyInstance,
-  repo: ScheduleRepository
-): void {
+export function registerScheduleRoutes(app: FastifyInstance, repo: ScheduleRepository): void {
   // CreateSchedule — POST /schedules/:Name
   app.post<{
     Params: { Name: string };
@@ -55,11 +53,9 @@ export function registerScheduleRoutes(
     const body = request.body;
 
     if (!name) throw new ValidationException("Name is required");
-    if (!body.ScheduleExpression)
-      throw new ValidationException("ScheduleExpression is required");
+    if (!body.ScheduleExpression) throw new ValidationException("ScheduleExpression is required");
     if (!body.Target) throw new ValidationException("Target is required");
-    if (!body.FlexibleTimeWindow)
-      throw new ValidationException("FlexibleTimeWindow is required");
+    if (!body.FlexibleTimeWindow) throw new ValidationException("FlexibleTimeWindow is required");
 
     // Validate expression
     parseScheduleExpression(body.ScheduleExpression);
@@ -68,17 +64,13 @@ export function registerScheduleRoutes(
 
     // Verify group exists
     if (!repo.groupExists(groupName)) {
-      throw new ResourceNotFoundException(
-        `Schedule group ${groupName} does not exist.`
-      );
+      throw new ResourceNotFoundException(`Schedule group ${groupName} does not exist.`);
     }
 
     // Check for conflict
     const existing = repo.getSchedule(name, groupName);
     if (existing) {
-      throw new ConflictException(
-        `Schedule ${name} already exists in group ${groupName}.`
-      );
+      throw new ConflictException(`Schedule ${name} already exists in group ${groupName}.`);
     }
 
     const ts = nowISO();
@@ -89,8 +81,7 @@ export function registerScheduleRoutes(
       group_name: groupName,
       arn,
       schedule_expression: body.ScheduleExpression,
-      schedule_expression_timezone:
-        body.ScheduleExpressionTimezone ?? "UTC",
+      schedule_expression_timezone: body.ScheduleExpressionTimezone ?? "UTC",
       state: body.State ?? "ENABLED",
       description: body.Description ?? null,
       target_json: JSON.stringify(body.Target),
@@ -121,9 +112,7 @@ export function registerScheduleRoutes(
 
     const row = repo.getSchedule(name, groupName);
     if (!row) {
-      throw new ResourceNotFoundException(
-        `Schedule ${name} does not exist in group ${groupName}.`
-      );
+      throw new ResourceNotFoundException(`Schedule ${name} does not exist in group ${groupName}.`);
     }
 
     return reply.status(200).send(scheduleRowToApi(row));
@@ -153,9 +142,7 @@ export function registerScheduleRoutes(
 
     const existing = repo.getSchedule(name, groupName);
     if (!existing) {
-      throw new ResourceNotFoundException(
-        `Schedule ${name} does not exist in group ${groupName}.`
-      );
+      throw new ResourceNotFoundException(`Schedule ${name} does not exist in group ${groupName}.`);
     }
 
     if (body.ScheduleExpression) {
@@ -168,30 +155,19 @@ export function registerScheduleRoutes(
       name,
       group_name: groupName,
       arn: existing.arn,
-      schedule_expression:
-        body.ScheduleExpression ?? existing.schedule_expression,
+      schedule_expression: body.ScheduleExpression ?? existing.schedule_expression,
       schedule_expression_timezone:
-        body.ScheduleExpressionTimezone ??
-        existing.schedule_expression_timezone,
+        body.ScheduleExpressionTimezone ?? existing.schedule_expression_timezone,
       state: body.State ?? existing.state,
-      description:
-        body.Description !== undefined
-          ? body.Description
-          : existing.description,
-      target_json: body.Target
-        ? JSON.stringify(body.Target)
-        : existing.target_json,
+      description: body.Description !== undefined ? body.Description : existing.description,
+      target_json: body.Target ? JSON.stringify(body.Target) : existing.target_json,
       flexible_time_window_json: body.FlexibleTimeWindow
         ? JSON.stringify(body.FlexibleTimeWindow)
         : existing.flexible_time_window_json,
-      start_date:
-        body.StartDate !== undefined ? body.StartDate : existing.start_date,
-      end_date:
-        body.EndDate !== undefined ? body.EndDate : existing.end_date,
-      kms_key_arn:
-        body.KmsKeyArn !== undefined ? body.KmsKeyArn : existing.kms_key_arn,
-      action_after_completion:
-        body.ActionAfterCompletion ?? existing.action_after_completion,
+      start_date: body.StartDate !== undefined ? body.StartDate : existing.start_date,
+      end_date: body.EndDate !== undefined ? body.EndDate : existing.end_date,
+      kms_key_arn: body.KmsKeyArn !== undefined ? body.KmsKeyArn : existing.kms_key_arn,
+      action_after_completion: body.ActionAfterCompletion ?? existing.action_after_completion,
       last_run: existing.last_run,
       creation_date: existing.creation_date,
       last_modification_date: ts,
@@ -214,9 +190,7 @@ export function registerScheduleRoutes(
 
     const deleted = repo.deleteSchedule(name, groupName);
     if (!deleted) {
-      throw new ResourceNotFoundException(
-        `Schedule ${name} does not exist in group ${groupName}.`
-      );
+      throw new ResourceNotFoundException(`Schedule ${name} does not exist in group ${groupName}.`);
     }
 
     return reply.status(200).send({});

@@ -16,11 +16,7 @@ afterEach(async () => {
   resetClock();
 });
 
-const createSchedule = async (
-  name: string,
-  expression: string,
-  state = "ENABLED"
-) => {
+const createSchedule = async (name: string, expression: string, state = "ENABLED") => {
   await ctx.app.inject({
     method: "POST",
     url: `/schedules/${name}`,

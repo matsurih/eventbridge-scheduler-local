@@ -49,10 +49,12 @@ export function initDb(dbPath: string): Database.Database {
 
   // Ensure default group exists
   const now = new Date().toISOString();
-  db.prepare(`
+  db.prepare(
+    `
     INSERT OR IGNORE INTO schedule_groups (name, arn, state, creation_date, last_modification_date)
     VALUES ('default', 'arn:aws:scheduler:us-east-1:000000000000:schedule-group/default', 'ACTIVE', ?, ?)
-  `).run(now, now);
+  `
+  ).run(now, now);
 
   return db;
 }

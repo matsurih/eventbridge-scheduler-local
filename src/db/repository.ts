@@ -1,9 +1,5 @@
 import type Database from "better-sqlite3";
-import type {
-  HistoryRow,
-  ScheduleGroupRow,
-  ScheduleRow,
-} from "../types.js";
+import type { HistoryRow, ScheduleGroupRow, ScheduleRow } from "../types.js";
 
 export class ScheduleRepository {
   constructor(private db: Database.Database) {}
@@ -20,23 +16,24 @@ export class ScheduleRepository {
   }
 
   getGroup(name: string): ScheduleGroupRow | undefined {
-    return this.db
-      .prepare("SELECT * FROM schedule_groups WHERE name = ?")
-      .get(name) as ScheduleGroupRow | undefined;
+    return this.db.prepare("SELECT * FROM schedule_groups WHERE name = ?").get(name) as
+      | ScheduleGroupRow
+      | undefined;
   }
 
   deleteGroup(name: string): boolean {
     // Delete all schedules in the group first
-    this.db
-      .prepare("DELETE FROM schedules WHERE group_name = ?")
-      .run(name);
+    this.db.prepare("DELETE FROM schedules WHERE group_name = ?").run(name);
     const result = this.db
       .prepare("DELETE FROM schedule_groups WHERE name = ? AND name != 'default'")
       .run(name);
     return result.changes > 0;
   }
 
-  listGroups(nextToken?: string, maxResults = 50): { groups: ScheduleGroupRow[]; nextToken?: string } {
+  listGroups(
+    nextToken?: string,
+    maxResults = 50
+  ): { groups: ScheduleGroupRow[]; nextToken?: string } {
     const offset = nextToken ? parseInt(nextToken, 10) : 0;
     const groups = this.db
       .prepare("SELECT * FROM schedule_groups ORDER BY name LIMIT ? OFFSET ?")
@@ -52,9 +49,7 @@ export class ScheduleRepository {
   }
 
   groupExists(name: string): boolean {
-    const row = this.db
-      .prepare("SELECT 1 FROM schedule_groups WHERE name = ?")
-      .get(name);
+    const row = this.db.prepare("SELECT 1 FROM schedule_groups WHERE name = ?").get(name);
     return row !== undefined;
   }
 
@@ -181,11 +176,7 @@ export class ScheduleRepository {
       .run(row);
   }
 
-  getHistory(
-    scheduleName?: string,
-    groupName?: string,
-    limit = 100
-  ): HistoryRow[] {
+  getHistory(scheduleName?: string, groupName?: string, limit = 100): HistoryRow[] {
     const conditions: string[] = [];
     const params: unknown[] = [];
 

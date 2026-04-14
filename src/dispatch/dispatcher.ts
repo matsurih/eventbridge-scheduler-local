@@ -45,12 +45,7 @@ export async function dispatchTarget(
 
   // All retries exhausted — send to DLQ if configured
   if (lastError && target.DeadLetterConfig?.Arn) {
-    await sendToDeadLetterQueue(
-      target.DeadLetterConfig.Arn,
-      lastError,
-      target,
-      ctx
-    );
+    await sendToDeadLetterQueue(target.DeadLetterConfig.Arn, lastError, target, ctx);
   }
 
   return { success: false, error: lastError?.message };
